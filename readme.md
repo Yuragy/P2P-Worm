@@ -88,15 +88,12 @@ All plugins are aggregated in ALL_TECHNIQUES for use by recon.py.
    Minimal external dependencies, TLS client, JSON serialization, raw sockets.
 
 ## Workflow Diagram
-recon.py
-  collects SSH data + host list
-  iterates plugins in guid/*.py
-      SHBruteForce → copies & launches payload/agent
-        TelnetDefaults → transfers & launches payload/agent
-            ↓
-        payload/agent
-            ↓
-       Persistence • P2P • C2 • Command Execution
+  collects SSH data + host list // iterates plugins in guid/*.py // SHBruteForce → copies & launches payload/agent
+   TelnetDefaults → transfers & launches payload/agent
+      ↓
+   payload/agent
+      ↓
+   Persistence • P2P • C2 • Command Execution
 
 ## Extensibility
 Project in development, keep an eye out for updates. 
