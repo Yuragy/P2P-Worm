@@ -89,10 +89,10 @@ All plugins are aggregated in ALL_TECHNIQUES for use by recon.py.
 
 ## Workflow Diagram
 recon.py
-  ├─ collects SSH data + host list
-  └─ iterates plugins in guid/*.py
-        ├─ SSHBruteForce → copies & launches payload/agent
-        └─ TelnetDefaults → transfers & launches payload/agent
+  collects SSH data + host list
+  iterates plugins in guid/*.py
+      SHBruteForce → copies & launches payload/agent
+        TelnetDefaults → transfers & launches payload/agent
             ↓
         payload/agent
             ↓
