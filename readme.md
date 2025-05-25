@@ -1,6 +1,12 @@
 # Self-Propagating Worm
 Collection of scripts and a binary agent for automated reconnaissance scanning, SSH/Telnet propagation, and C2 control.
 
+## 🚫 Disclaimer
+
+This repository is provided for **educational purposes only** and intended for **authorized security research**.
+Use of these materials in unauthorized or illegal activities is **strictly prohibited**.
+
+
 ## Description
 This project implements a multi-component self-propagating worm, consisting of:
 1. **recon.py** — a reconnaissance module that gathers SSH credentials, scans the local network, and launches attack plugins.  
@@ -89,5 +95,3 @@ All plugins are aggregated in ALL_TECHNIQUES for use by recon.py.
 
 ## Extensibility
 Project in development, keep an eye out for updates. 
-## This is a tutorial demonstrating the possibility, the responsibility for use lies with you!
-
