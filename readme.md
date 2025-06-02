@@ -1,4 +1,4 @@
-# 🪱 Self-Propagating Worm
+# Self-Propagating Worm
 
 > Collection of scripts **and** a binary agent for automated reconnaissance scanning, SSH/Telnet propagation, and C2 control.
 
