@@ -10,7 +10,7 @@ Use of these materials in unauthorized or illegal activities is **strictly prohi
 
 ---
 
-## 📜 Description  
+## Description  
 
 This project implements a multi-component **self-propagating worm**, consisting of:
 
@@ -41,7 +41,7 @@ The script will automatically:
 
 ---
 
-## 🔍 Recon Module — `recon.py`
+## Recon Module — `recon.py`
 
 | Function                               | Purpose                                                                                                                     |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -52,7 +52,7 @@ The script will automatically:
 | **`discover_hosts()`**                 | Find live hosts via:<br>• mDNS/Bonjour → `dns-sd -B _ssh._tcp`<br>• ARP + ping sweep                                        |
 | **`load_creds_db(path="creds.json")`** | Load `(user, password)` pairs from JSON;<br>append key-based creds for current user                                         |
 | **`probe_ports(ip)`**                  | Test ports **22, 23, 80, 445** with `nc -z`; return open list                                                               |
-| **`main()`**                           | Orchestrates:<br>1️⃣ `prepare_ssh_data()` → 2️⃣ `load_creds_db()` → 3️⃣ `discover_hosts()` → 4️⃣ iterate hosts & techniques |
+| **`main()`**                           | Orchestrates:<br>1 `prepare_ssh_data()` → 2 `load_creds_db()` → 3 `discover_hosts()` → 4 iterate hosts & techniques |
 
 ---
 
@@ -103,5 +103,76 @@ flowchart LR
     end
 ```
 
-## Server
+# Server
 The server component receives beacons from Go agents in JSON format, generates unique UUIDs for each, stores and updates host data in a MySQL database, issues pending commands for execution, and marks them as executed. Database connection settings are centralized in a single configuration file, and all operations on the hosts, commands, and executed_commands tables are handled by a wrapper class. A simple web interface allows you to view the list of registered agents and add new commands with an optional OS filter.
+
+
+# Packer
+packer_loader.exe is a self-extracting executable with a built in virtual machine.  
+It XOR encrypts any binary payload and bundles it with a loader into a single EXE.  
+When run the packed EXE, it automatically decrypts the payload and executes it in the VM.
+
+## Features
+
+- **Pack any binary** into a self extracting EXE.  
+- **XOR encryption** of the payload at pack time and automatic decryption at run time.  
+- **Built in VM** for a simple stack based bytecode:
+  - `PUSH`, `ADD`, `SUB`, `MUL`, `DIV`, `PRINT`, `HALT`  
+- **No external dependencies** all code is contained in the EXE.
+
+## Build on Windows / MinGW
+
+1. Place these files in one folder:
+   - `vm.h`, `vm.c`  
+   - `packer_loader.c`  
+   - `Makefile`  
+
+2. Open an MSYS2/MinGW shell and run:
+   ```
+   make
+
+3. The build produces `packer_loader.exe`.
+
+## Usage
+
+1. **Pack a payload**
+
+   ```sh
+   packer_loader.exe pack <input.bin> <output.exe>
+   ```
+
+   * `<input.bin>`: payload.
+   * `<output.exe>`: name of the self extracting EXE.
+
+2. **Run the packed EXE**
+
+   ```sh
+   output.exe
+   ```
+
+   At launch, it will:
+
+   1. Read its own file.
+   2. Locate the `0xDEADBEEF` marker.
+   3. XOR-decrypt the embedded payload.
+   4. Execute the payload in the VM.
+
+## Working
+
+```sh
+Build: 
+make
+
+Pack:
+packer_loader.exe pack bytecode.bin packed_vm.exe
+
+Run:
+packed_vm.exe
+```
+
+## Customization
+
+* **Encryption key**: edit the `key` array in `packer_loader.c`.
+* **VM opcodes / stack size**: modify `vm.h`/`vm.c`.
+* **Add new instructions**: extend the enum in `vm.h` and handling in `run_vm`.
+
