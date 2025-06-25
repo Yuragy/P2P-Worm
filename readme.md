@@ -22,7 +22,7 @@ This project implements a multi-component **self-propagating worm**, consisting 
 
 ---
 
-## ⚡ Quick Usage
+## Quick Usage
 
 ```bash
 # 1 – Run network reconnaissance
@@ -56,7 +56,7 @@ The script will automatically:
 
 ---
 
-## 🧩 Plugins — `guid/*.py`
+## Plugins — `guid/*.py`
 
 All plugins share a **Technique interface**:
 
@@ -74,7 +74,7 @@ All are aggregated into **`ALL_TECHNIQUES`** for use by `recon.py`.
 
 ---
 
-## 🤖 Agent — `agent.go`
+## Agent — `agent.go`
 
 | Stage                | Behaviour                                                                                                                                                    |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -87,7 +87,7 @@ All are aggregated into **`ALL_TECHNIQUES`** for use by `recon.py`.
 
 ---
 
-## 🔧 Extensibility
+##  Extensibility
 
 The project is **under active development**—expect new techniques, transports, and evasions.
 Feel free to open issues or pull requests!
@@ -103,5 +103,5 @@ flowchart LR
     end
 ```
 
-Stay tuned for updates.
-
+## Server
+The server component receives beacons from Go agents in JSON format, generates unique UUIDs for each, stores and updates host data in a MySQL database, issues pending commands for execution, and marks them as executed. Database connection settings are centralized in a single configuration file, and all operations on the hosts, commands, and executed_commands tables are handled by a wrapper class. A simple web interface allows you to view the list of registered agents and add new commands with an optional OS filter.
