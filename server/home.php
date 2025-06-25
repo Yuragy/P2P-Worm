@@ -20,10 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $osFilter = trim($_POST['os_filter'] ?? '') ?: null;
 
     if ($command === '') {
-        $error = 'Введите текст команды.';
+        $error = 'Enter the text of the command';
     } else {
         $db->addCommand($command, $osFilter);
-        $message = 'Команда успешно добавлена.';
+        $message = 'The command has been successfully added';
     }
 }
 
@@ -58,9 +58,9 @@ $commands = $db->listCommands();
         </label>
         <label>
           OS
-          <input type="text" name="os_filter" placeholder="например, linux">
+          <input type="text" name="os_filter" placeholder="linux">
         </label>
-        <button type="submit">Добавить</button>
+        <button type="submit">Add</button>
       </form>
     </section>
 
