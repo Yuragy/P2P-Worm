@@ -20,6 +20,12 @@ This project implements a multi-component **self-propagating worm**, consisting 
 | **`guid/*.py`** | Technique plugins for remote access over **SSH** and **Telnet** |
 | **`agent.go`** | Lightweight C2 agent: deploys on victims, enables peer-to-peer propagation & remote command execution |
 
+**P2P Module**
+Maintains a dynamic peer list by listening on a designated TCP port, ingesting neighbor-reported node addresses, and seamlessly merging them into a unified set without duplicates. This ensures the agent always has up-to-date peer endpoints for decentralized communication.
+
+**Tor Fallback**
+Provides a resilient C2 channel by first attempting a direct HTTPS POST and, on failure or non-200 response, automatically rerouting the same request through the Tor network via a SOCKS5 proxy. This preserves connectivity and anonymity even when the primary server is unreachable.
+
 ---
 
 ## Quick Usage
