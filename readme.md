@@ -31,10 +31,10 @@ Provides a resilient C2 channel by first attempting a direct HTTPS POST and, on 
 ## Quick Usage
 
 ```
-# 1 – Run network reconnaissance
+ Run network reconnaissance
 python recon.py
 
-# 2 – When prompted:
+ When prompted:
 #    • staging directory (default: /tmp/ssh_creds)
 #    • any additional credentials
 ````
@@ -62,7 +62,7 @@ The script will automatically:
 
 ---
 
-## Plugins — guid/*.py
+## Plugins — guid/.py
 
 All plugins share a Technique interface:
 
@@ -84,9 +84,9 @@ All are aggregated into ALL_TECHNIQUES for use by recon.py.
 
 | Stage                | Behaviour                                                                                                                                                    |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Bootstrap**        | Copy binary → safe dir macOS `~/Library/Application Support`, Linux `~/.local/bin`, Win `%APPDATA%`<br>Remove macOS quarantine<br>Relaunch & exit original |
-| **Persistence**      | macOS → LaunchAgent plist<br>Linux → systemd user unit<br>Windows → `HKCU\Run` key                                                                           |
-| **P2P Listener**     | Default TCP **40444** → exchange peer lists (`savePeers` / `listPeers`)                                                                                      |
+| **Bootstrap**        | Copy binary → safe dir macOS ~/Library/Application Support, Linux ~/.local/bin, Win %APPDATA%<br>Remove macOS quarantine<br>Relaunch & exit original |
+| **Persistence**      | macOS → LaunchAgent plist<br>Linux → systemd user unit<br>Windows → HKCU\Run key                                                                           |
+| **P2P Listener**     | Default TCP **40444** → exchange peer lists savePeers/listPeers                                                                                      |
 | **Main C2 Loop**     | Every **90 s**:<br>• gather host info + peers<br>• POST to CDN endpoint<br>• execute returned commands in parallel                                           |
 | **Command Handling** | self-update → hot-swap binary<br>exfil-keys → collect SSH data<br>scan-subnet → built-in port scanner<br> → run as shell cmd            |
 | **Core**             | Go 1.XX, statically linked OS + arch: macOS/Linux/Windows, arm/x86                                                                                         |
