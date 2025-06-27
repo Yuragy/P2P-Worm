@@ -182,7 +182,7 @@ packed_vm.exe
 * **VM opcodes / stack size**: modify vm.h/vm.c.
 * **Add new instructions**: extend the enum in vm.h and handling in run_vm.
 
-# Watchdog & P2P Loader Module
+# Watchdog & P2P Loader Module /P2P_control
 
 This component provides:
 
