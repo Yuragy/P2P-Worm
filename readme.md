@@ -51,10 +51,10 @@ The script will automatically:
 
 | Function                               | Purpose                                                                                                                     |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **find_private_keys**              | Locate `~/.ssh/id_*` (excluding .pub), set `600`, return paths                                                            |
+| **find_private_keys**              | Locate `~/.ssh/id_*` (excluding .pub), set 600, return paths                                                            |
 | **parse_known_hosts**              | Parse `~/.ssh/known_hosts`, ignore comments / hashes, return host list                                                      |
 | **copy_to_staging**            | Create `/tmp/ssh_creds`, copy keys, return new paths                                                                        |
-| **prepare_ssh_data**               | Aggregate keys & hosts → write `/tmp/ssh_creds/ssh_data.json`<br>Returns:<br>`{"keys": [...], "known_hosts": [...]}`        |
+| **prepare_ssh_data**               | Aggregate keys & hosts → write `/tmp/ssh_creds/ssh_data.json`<br>Returns:<br>{"keys": [], "known_hosts": []}        |
 | **discover_hosts**                 | Find live hosts via:<br>• mDNS/Bonjour → `dns-sd -B _ssh._tcp`<br>• ARP + ping sweep                                        |
 | **load_creds_db(path="creds.json")** | Load `(user, password)` pairs from JSON;<br>append key-based creds for current user                                         |
 | **probe_ports**                  | Test ports **22, 23, 80, 445** with nc -z; return open list                                                               |
@@ -64,7 +64,7 @@ The script will automatically:
 
 ## Plugins — guid/*.py
 
-All plugins share a **Technique interface**:
+All plugins share a Technique interface:
 
 ```
 def applicable(host) -> bool
@@ -73,8 +73,8 @@ def execute(host, creds_db) -> bool
 
 | Plugin               | What it does                                                                                                       |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| **`SSHBruteForce`**  | Targets port **22** → tries user/pass combos **&** SSH keys; on success, uploads & runs the payload/agent via SFTP |
-| **`TelnetDefaults`** | Targets port **23** → attempts default Telnet creds; on success, transfers the agent in Base64 and executes        |
+| **SSHBruteForce**  | Targets port **22** → tries user/pass combos **&** SSH keys; on success, uploads & runs the payload/agent via SFTP |
+| **TelnetDefaults** | Targets port **23** → attempts default Telnet creds; on success, transfers the agent in Base64 and executes        |
 
 All are aggregated into **`ALL_TECHNIQUES`** for use by recon.py.
 
@@ -84,12 +84,12 @@ All are aggregated into **`ALL_TECHNIQUES`** for use by recon.py.
 
 | Stage                | Behaviour                                                                                                                                                    |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Bootstrap**        | Copy binary → safe dir (macOS `~/Library/Application Support`, Linux `~/.local/bin`, Win `%APPDATA%`)<br>Remove macOS quarantine<br>Relaunch & exit original |
+| **Bootstrap**        | Copy binary → safe dir macOS `~/Library/Application Support`, Linux `~/.local/bin`, Win `%APPDATA%`<br>Remove macOS quarantine<br>Relaunch & exit original |
 | **Persistence**      | macOS → LaunchAgent plist<br>Linux → systemd user unit<br>Windows → `HKCU\Run` key                                                                           |
 | **P2P Listener**     | Default TCP **40444** → exchange peer lists (`savePeers` / `listPeers`)                                                                                      |
 | **Main C2 Loop**     | Every **90 s**:<br>• gather host info + peers<br>• POST to CDN endpoint<br>• execute returned commands in parallel                                           |
-| **Command Handling** | `self-update` → hot-swap binary<br>`exfil-keys` → collect SSH data<br>`scan-subnet` → built-in port scanner<br>*anything else* → run as shell cmd            |
-| **Core**             | Go 1.XX, statically linked (OS + arch: macOS/Linux/Windows, arm/x86)                                                                                         |
+| **Command Handling** | self-update → hot-swap binary<br>exfil-keys → collect SSH data<br>scan-subnet → built-in port scanner<br> → run as shell cmd            |
+| **Core**             | Go 1.XX, statically linked OS + arch: macOS/Linux/Windows, arm/x86                                                                                         |
 
 ---
 
@@ -129,15 +129,15 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
 ## Build on Windows / MinGW
 
 1. Place these files in one folder:
-   - `vm.h`, `vm.c`  
-   - `packer_loader.c`  
-   - `Makefile`  
+   - vm.h, vm.c  
+   - packer_loader.c 
+   - Makefile  
 
 2. Open an MSYS2/MinGW shell and run:
    ```
    make
 
-3. The build produces `packer_loader.exe`.
+3. The build produces packer_loader.exe.
 
 ## Usage
 
@@ -147,8 +147,8 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
    packer_loader.exe pack <input.bin> <output.exe>
    ```
 
-   * `<input.bin>`: payload.
-   * `<output.exe>`: name of the self extracting EXE.
+   * <input.bin>: payload.
+   * <output.exe>: name of the self extracting EXE.
 
 2. **Run the packed EXE**
 
@@ -159,7 +159,7 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
    At launch, it will:
 
    1. Read its own file.
-   2. Locate the `0xDEADBEEF` marker.
+   2. Locate the 0xDEADBEEF marker.
    3. XOR-decrypt the embedded payload.
    4. Execute the payload in the VM.
 
