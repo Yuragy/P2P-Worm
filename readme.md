@@ -30,19 +30,17 @@ Provides a resilient C2 channel by first attempting a direct HTTPS POST and, on 
 
 ## Quick Usage
 
-```
  Run network reconnaissance
 python recon.py
 
  When prompted:
-    • staging directory (default: /tmp/ssh_creds)
+    • staging directory default: /tmp/ssh_creds
     • any additional credentials
-````
 
 The script will automatically:
 
-1. **Collect** SSH private keys & known_hosts → save as JSON in the staging dir.
-2. **Discover** live hosts in the LAN.
+1. Collect SSH private keys & known_hosts → save as JSON in the staging dir.
+2. Discover live hosts in the LAN.
 3. For each host, apply the first successful technique from ALL_TECHNIQUES.
 
 ---
