@@ -12,12 +12,12 @@ Use of these materials in unauthorized or illegal activities is **strictly prohi
 
 ## Description  
 
-This project implements a multi-component **self-propagating worm**, consisting of:
+This project implements a multi-component self-propagating worm, consisting of:
 
 | Component | Role |
 |-----------|------|
 | **recon.py** | Reconnaissance module: gathers SSH credentials, scans the network, launches attack plugins |
-| **guid/.py** | Technique plugins for remote access over **SSH** and **Telnet** |
+| **guid/.py** | Technique plugins for remote access over SSH and Telnet |
 | **agent.go** | Lightweight C2 agent: deploys on victims, enables peer-to-peer propagation & remote command execution |
 
 **P2P Module**
@@ -35,15 +35,15 @@ Provides a resilient C2 channel by first attempting a direct HTTPS POST and, on 
 python recon.py
 
  When prompted:
-#    • staging directory (default: /tmp/ssh_creds)
-#    • any additional credentials
+    • staging directory (default: /tmp/ssh_creds)
+    • any additional credentials
 ````
 
 The script will automatically:
 
 1. **Collect** SSH private keys & known_hosts → save as JSON in the staging dir.
 2. **Discover** live hosts in the LAN.
-3. For each host, apply the first **successful** technique from ALL_TECHNIQUES.
+3. For each host, apply the first successful technique from ALL_TECHNIQUES.
 
 ---
 
@@ -57,7 +57,7 @@ The script will automatically:
 | **prepare_ssh_data**               | Aggregate keys & hosts → write /tmp/ssh_creds/ssh_data.json`<br>Returns:<br>{"keys": [], "known_hosts": []}        |
 | **discover_hosts**                 | Find live hosts via:<br>• mDNS/Bonjour → dns-sd -B _ssh._tcp`<br>• ARP + ping sweep                                        |
 | **load_creds_db(path="creds.json")** | Load user, password pairs from JSON;<br>append key-based creds for current user                                         |
-| **probe_ports**                  | Test ports **22, 23, 80, 445** with nc -z; return open list                                                               |
+| **probe_ports**                  | Test ports 22, 23, 80, 445 with nc -z; return open list                                                               |
 | **main**                           | Orchestrates:<br>1 prepare_ssh_data() → 2 load_creds_db() → 3 discover_hosts() → 4 iterate hosts & techniques |
 
 ---
@@ -73,7 +73,7 @@ def execute(host, creds_db) -> bool
 
 | Plugin               | What it does                                                                                                       |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| **SSHBruteForce**  | Targets port **22** → tries user/pass combos **&** SSH keys; on success, uploads & runs the payload/agent via SFTP |
+| **SSHBruteForce**  | Targets port **22** → tries user/pass combos & SSH keys; on success, uploads & runs the payload/agent via SFTP |
 | **TelnetDefaults** | Targets port **23** → attempts default Telnet creds; on success, transfers the agent in Base64 and executes        |
 
 All are aggregated into ALL_TECHNIQUES for use by recon.py.
@@ -86,8 +86,8 @@ All are aggregated into ALL_TECHNIQUES for use by recon.py.
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Bootstrap**        | Copy binary → safe dir macOS ~/Library/Application Support, Linux ~/.local/bin, Win %APPDATA%<br>Remove macOS quarantine<br>Relaunch & exit original |
 | **Persistence**      | macOS → LaunchAgent plist<br>Linux → systemd user unit<br>Windows → HKCU\Run key                                                                           |
-| **P2P Listener**     | Default TCP **40444** → exchange peer lists savePeers/listPeers                                                                                      |
-| **Main C2 Loop**     | Every **90 s**:<br>• gather host info + peers<br>• POST to CDN endpoint<br>• execute returned commands in parallel                                           |
+| **P2P Listener**     | Default TCP 40444 → exchange peer lists savePeers/listPeers                                                                                      |
+| **Main C2 Loop**     | Every 90 s:<br>• gather host info + peers<br>• POST to CDN endpoint<br>• execute returned commands in parallel                                           |
 | **Command Handling** | self-update → hot-swap binary<br>exfil-keys → collect SSH data<br>scan-subnet → built-in port scanner<br> → run as shell cmd            |
 | **Core**             | Go 1.XX, statically linked OS + arch: macOS/Linux/Windows, arm/x86                                                                                         |
 
@@ -95,7 +95,7 @@ All are aggregated into ALL_TECHNIQUES for use by recon.py.
 
 ##  Extensibility
 
-The project is **under active development**—expect new techniques, transports, and evasions.
+The project is under active development—expect new techniques, transports, and evasions.
 Feel free to open issues or pull requests!
 
 ```mermaid
@@ -120,11 +120,11 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
 
 ## Features
 
-- **Pack any binary** into a self extracting EXE.  
-- **XOR encryption** of the payload at pack time and automatic decryption at run time.  
-- **Built in VM** for a simple stack based bytecode:
+- Pack any binary into a self extracting EXE.  
+- XOR encryption of the payload at pack time and automatic decryption at run time.  
+- Built in VM for a simple stack based bytecode:
   - PUSH, ADD, SUB, MUL, DIV, PRINT, HALT  
-- **No external dependencies** all code is contained in the EXE.
+- No external dependencies all code is contained in the EXE.
 
 ## Build on Windows / MinGW
 
@@ -143,7 +143,7 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
 
 1. **Pack a payload**
 
-   ```sh
+   ```
    packer_loader.exe pack <input.bin> <output.exe>
    ```
 
@@ -152,7 +152,7 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
 
 2. **Run the packed EXE**
 
-   ```sh
+   ```
    output.exe
    ```
 
@@ -165,7 +165,7 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
 
 ## Working
 
-```sh
+```
 Build: 
 make
 
