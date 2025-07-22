@@ -30,12 +30,11 @@ Provides a resilient C2 channel by first attempting a direct HTTPS POST and, on 
 
 ## Quick Usage
 
-Run network reconnaissance
-python recon.py
+Run network reconnaissance: python recon.py
 
- When prompted:
-    • staging directory default: /tmp/ssh_creds
-    • any additional credentials
+When prompted:
+    * staging directory default: /tmp/ssh_creds
+    * any additional credentials
 
 The script will automatically:
 
