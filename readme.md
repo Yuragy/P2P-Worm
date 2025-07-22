@@ -115,14 +115,14 @@ packer_loader.exe is a self-extracting executable with a built in virtual machin
 It XOR encrypts any binary payload and bundles it with a loader into a single EXE.  
 When run the packed EXE, it automatically decrypts the payload and executes it in the VM.
 
-## Features
+### Features
 
 - Pack any binary into a self extracting EXE.  
 - XOR encryption of the payload at pack time and automatic decryption at run time.  
 - Built in VM for a simple stack based bytecode PUSH, ADD, SUB, MUL, DIV, PRINT, HALT  
 - No external dependencies all code is contained in the EXE.
 
-## Build on Windows / MinGW
+### Build on Windows / MinGW
 
 1. Place these files in one folder:
    - vm.h, vm.c  
@@ -134,7 +134,7 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
 
 3. The build produces packer_loader.exe.
 
-## Usage
+### Usage
 
 1. Pack a payload packer_loader.exe pack <input.bin> <output.exe>
    
@@ -148,7 +148,7 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
    * XOR decrypt the embedded payload.
    * Execute the payload in the VM.
 
-## Working
+### Working
 
 Build:
 ```
@@ -163,12 +163,13 @@ Run:
 packed_vm.exe
 ```
 
-## Customization
+### Customization
 
 * Encryption key: edit the key array in packer_loader.c.
 * VM opcodes/stack size: modify vm.h/vm.c.
 * Add new instructions: extend the enum in vm.h and handling in run_vm.
   
+---
 
 # Watchdog & P2P Loader Module /P2P_control
 
