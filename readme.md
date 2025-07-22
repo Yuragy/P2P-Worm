@@ -45,7 +45,7 @@ The script will automatically:
 
 ---
 
-## Recon Module — recon.py
+## Recon Module
 
 | Function                               | Purpose                                                                                                                     |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -120,8 +120,7 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
 
 - Pack any binary into a self extracting EXE.  
 - XOR encryption of the payload at pack time and automatic decryption at run time.  
-- Built in VM for a simple stack based bytecode:
-  - PUSH, ADD, SUB, MUL, DIV, PRINT, HALT  
+- Built in VM for a simple stack based bytecode PUSH, ADD, SUB, MUL, DIV, PRINT, HALT  
 - No external dependencies all code is contained in the EXE.
 
 ## Build on Windows / MinGW
@@ -138,19 +137,17 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
 
 ## Usage
 
-1. Pack a payload: packer_loader.exe pack <input.bin> <output.exe>
+1. Pack a payload packer_loader.exe pack <input.bin> <output.exe>
    
    * <input.bin>: payload.
    * <output.exe>: name of the self extracting EXE.
 
-2. Run the packed EXE:  output.exe
+2. Run the packed EXE output.exe
 
-   At launch, it will:
-
-   1. Read its own file.
-   2. Locate the 0xDEADBEEF marker.
-   3. XOR-decrypt the embedded payload.
-   4. Execute the payload in the VM.
+   * Read its own file.
+   * Locate the 0xDEADBEEF marker.
+   * XOR decrypt the embedded payload.
+   * Execute the payload in the VM.
 
 ## Working
 
