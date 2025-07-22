@@ -252,12 +252,81 @@ watchdog.exe <agent.exe> <https://c2.server/agent.exe>
 
 ### Updating the C2 List
 
-1. Edit `dll/c2_config.c`, adjust C2Count and the C2Addresses array.
+1. Edit dll/c2_config.c, adjust C2Count and the C2Addresses array.
 2. Rebuild just the DLL:
 
    ```
    make c2_config.dll
    ```
 3. The running service will pick up the new addresses on its next DLL reload cycle.
+
+## Scanner
+
+Console tool that, reads a local SQLite CVE DB. Checks kernel and specified package versions.Prints matching CVEs and local exploits from a CSV
+
+## Dependencies
+
+* gcc, make
+* SQLite3 dev libs libsqlite3-dev/sqlite-devel
+* Python 3.7+ to build the DB
+
+## Build
+
+```
+git clone <repo>
+cd cve_scanner_c
+make           
+```
+
+Useful targets:
+
+```
+make db        
+make exploits   
+make clean     
+make clean-db  
+```
+
+## Options:
+
+* --db PATH        path to the SQLite CVE DB
+* --exploits PATH  path to exploits CSV id,cve,description,path
+* --kernel         scan kernel version
+* --packages LIST  comma separated package names
+* -h/--help        help
+
+## Updating the CVE DB
+
+```
+./tools/update_nvd_sqlite.py data/nvd.sqlite3 --json-dir data/nvd_json --download
+```
+
+Subsequent runs can omit --download if JSON files are already present.
+
+## Data formats
+
+SQLite table cves:
+
+```
+id TEXT PRIMARY KEY
+summary TEXT
+product TEXT            -- linux_kernel or package name
+version_start_inc TEXT  -- inclusive bound, NULL if none
+version_end_exc  TEXT   -- exclusive bound, NULL if none
+```
+
+exploits.csv:
+
+```
+id,cve,description,path
+50035,CVE-2021-3156,Sudo heap overflow exploit,exploits/linux/local/50035.py
+```
+
+## Notes
+
+* Version range checks are done in C; keep ranges accurate.
+* CSV parser is simple: no quotes or commas inside fields.
+* Missing packages just produce a notice.
+* On OOM, entries are skipped safely (no crash).
 
 
