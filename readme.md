@@ -163,22 +163,24 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
 
 ## Working
 
+Build:
 ```
-Build: 
 make
-
+```
 Pack:
+```
 packer_loader.exe pack bytecode.bin packed_vm.exe
-
+```
 Run:
+```
 packed_vm.exe
 ```
 
 ## Customization
 
-* **Encryption key**: edit the key array in packer_loader.c.
-* **VM opcodes / stack size**: modify vm.h/vm.c.
-* **Add new instructions**: extend the enum in vm.h and handling in run_vm.
+* Encryption key: edit the key array in packer_loader.c.
+* VM opcodes/stack size: modify vm.h/vm.c.
+* Add new instructions: extend the enum in vm.h and handling in run_vm.
   
 
 # Watchdog & P2P Loader Module /P2P_control
@@ -188,9 +190,9 @@ This component provides:
 1. **Self-defense** — detects debuggers, virtual machines, and sandbox environments.
 2. **Watchdog daemon**:
 
-   * Daemonizes the process (double-fork).
+   * Daemonizes the process, double fork.
    * Monitors the worm process and respawns it if it dies.
-   * Verifies the binarys SHA-256 hash every 30 seconds; if changed or missing, downloads the latest version from a URL and restarts it.
+   * Verifies the binarys SHA256 hash every 30 seconds; if changed or missing, downloads the latest version from a URL and restarts it.
 3. **P2P loader**:
 
    * Runs in a background thread and every 30 seconds loads c2_config.dll.
@@ -223,8 +225,8 @@ This component provides:
 
 #### Prerequisites
 
-* **MinGW-w64** toolchain (x86_64-w64-mingw32-gcc)
-* Development libraries for **libcurl** and **OpenSSL**
+* MinGW-w64 toolchain x86_64-w64-mingw32-gcc
+* Libcurl and OpenSSL
 
 #### Building
 
@@ -277,7 +279,6 @@ On OOM, entries are skipped safely, no crash.
 ## Build
 
 ```
-git clone <repo>
 cd cve_scanner_c
 make           
 ```
