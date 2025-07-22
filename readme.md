@@ -53,7 +53,7 @@ The script will automatically:
 | **copy_to_staging**            | Create /tmp/ssh_creds, copy keys, return new paths                                                                        |
 | **prepare_ssh_data**               | Aggregate keys & hosts → write /tmp/ssh_creds/ssh_data.json`<br>Returns:<br>{"keys": [], "known_hosts": []}        |
 | **discover_hosts**                 | Find live hosts via:<br>• mDNS/Bonjour → dns-sd -B _ssh._tcp`<br>• ARP + ping sweep                                        |
-| **load_creds_db(path="creds.json")** | Load user, password pairs from JSON;<br>append key-based creds for current user                                         |
+| **load_creds_db** | Load user, password pairs from JSON;<br>append key-based creds for current user                                         |
 | **probe_ports**                  | Test ports 22, 23, 80, 445 with nc -z; return open list                                                               |
 | **main**                           | Orchestrates:<br>1 prepare_ssh_data() → 2 load_creds_db() → 3 discover_hosts() → 4 iterate hosts & techniques |
 
