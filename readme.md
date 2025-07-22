@@ -263,7 +263,10 @@ watchdog.exe <agent.exe> <https://c2.server/agent.exe>
 
 # Scanner
 
-Console tool that, reads a local SQLite CVE DB. Checks kernel and specified package versions.Prints matching CVEs and local exploits from a CSV
+Console tool that, reads a local SQLite CVE DB. Checks kernel and specified package versions.Prints matching CVEs and local exploits from a CSV.
+Version range checks are done in C; keep ranges accurate. CSV parser is simple: no quotes or commas inside fields. Missing packages just produce a notice.
+On OOM, entries are skipped safely, no crash.
+
 
 ## Dependencies
 
@@ -320,12 +323,4 @@ exploits.csv:
 id,cve,description,path
 50035,CVE-2021-3156,Sudo heap overflow exploit,exploits/linux/local/50035.py
 ```
-
-## Notes
-
-* Version range checks are done in C; keep ranges accurate.
-* CSV parser is simple: no quotes or commas inside fields.
-* Missing packages just produce a notice.
-* On OOM, entries are skipped safely (no crash).
-
 
