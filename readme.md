@@ -5,8 +5,8 @@
 ---
 
 ## 🚫 Disclaimer  
-This repository is provided for **educational purposes only** and intended for **authorized security research**.  
-Use of these materials in unauthorized or illegal activities is **strictly prohibited**.
+This repository is provided for educational purposes only and intended for authorized security research.  
+Use of these materials in unauthorized or illegal activities is strictly prohibited.
 
 ---
 
@@ -16,9 +16,9 @@ This project implements a multi-component self-propagating worm, consisting of:
 
 | Component | Role |
 |-----------|------|
-| **recon.py** | Reconnaissance module: gathers SSH credentials, scans the network, launches attack plugins |
-| **guid/.py** | Technique plugins for remote access over SSH and Telnet |
-| **agent.go** | Lightweight C2 agent: deploys on victims, enables peer-to-peer propagation & remote command execution |
+| **recon** | Reconnaissance module: gathers SSH credentials, scans the network, launches attack plugins |
+| **guid** | Technique plugins for remote access over SSH and Telnet |
+| **agent** | Lightweight C2 agent: deploys on victims, enables peer-to-peer propagation & remote command execution |
 
 **P2P Module**
 Maintains a dynamic peer list by listening on a designated TCP port, ingesting neighbor-reported node addresses, and seamlessly merging them into a unified set without duplicates. This ensures the agent always has up-to-date peer endpoints for decentralized communication.
@@ -30,7 +30,7 @@ Provides a resilient C2 channel by first attempting a direct HTTPS POST and, on 
 
 ## Quick Usage
 
- Run network reconnaissance
+Run network reconnaissance
 python recon.py
 
  When prompted:
@@ -49,7 +49,7 @@ The script will automatically:
 
 | Function                               | Purpose                                                                                                                     |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **find_private_keys**              | Locate ~/.ssh/id_ (excluding .pub), set 600, return paths                                                            |
+| **find_private_keys**              | Locate ~/.ssh/id_ excluding .pub, set 600, return paths                                                            |
 | **parse_known_hosts**              | Parse ~/.ssh/known_hosts, ignore comments / hashes, return host list                                                      |
 | **copy_to_staging**            | Create /tmp/ssh_creds, copy keys, return new paths                                                                        |
 | **prepare_ssh_data**               | Aggregate keys & hosts → write /tmp/ssh_creds/ssh_data.json`<br>Returns:<br>{"keys": [], "known_hosts": []}        |
@@ -60,25 +60,25 @@ The script will automatically:
 
 ---
 
-## Plugins — guid/.py
+## Plugins — guid
 
 All plugins share a Technique interface:
 
 ```
-def applicable(host) -> bool
-def execute(host, creds_db) -> bool
+def applicable host -> bool
+def execute host, creds_db -> bool
 ```
 
 | Plugin               | What it does                                                                                                       |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| **SSHBruteForce**  | Targets port **22** → tries user/pass combos & SSH keys; on success, uploads & runs the payload/agent via SFTP |
-| **TelnetDefaults** | Targets port **23** → attempts default Telnet creds; on success, transfers the agent in Base64 and executes        |
+| **SSHBruteForce**  | Targets port 22 → tries user/pass combos & SSH keys; on success, uploads & runs the payload/agent via SFTP |
+| **TelnetDefaults** | Targets port 23 → attempts default Telnet creds; on success, transfers the agent in Base64 and executes        |
 
 All are aggregated into ALL_TECHNIQUES for use by recon.py.
 
 ---
 
-## Agent — agent.go
+## Agent — agent
 
 | Stage                | Behaviour                                                                                                                                                    |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -132,27 +132,18 @@ When run the packed EXE, it automatically decrypts the payload and executes it i
    - Makefile  
 
 2. Open an MSYS2/MinGW shell and run:
-   ```
    make
 
 3. The build produces packer_loader.exe.
 
 ## Usage
 
-1. **Pack a payload**
-
-   ```
-   packer_loader.exe pack <input.bin> <output.exe>
-   ```
-
+1. Pack a payload: packer_loader.exe pack <input.bin> <output.exe>
+   
    * <input.bin>: payload.
    * <output.exe>: name of the self extracting EXE.
 
-2. **Run the packed EXE**
-
-   ```
-   output.exe
-   ```
+2. Run the packed EXE:  output.exe
 
    At launch, it will:
 
