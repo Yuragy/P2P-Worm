@@ -321,6 +321,10 @@ exploits.csv:
 id,cve,description,path
 50035,CVE-2021-3156,Sudo heap overflow exploit,exploits/linux/local/50035.py
 ```
+
+---
+
+
 # PTT‑lib
  
 Platform independent shared C library so/dll that extracts and serializes Kerberos tickets from the local cache krb5cc_<uid> for use in SMB/SSH authentication pass‑the‑ticket. Supports reading the default or a custom ccache path. Serializes each ticket into a compact binary format: [4‑byte BE length][ticket data]. Lightweight, with no external dependencies except MIT Kerberos. Suitable for dynamic loading via dlopen / LoadLibrary and invocation from Go/Python/C embeddings  
