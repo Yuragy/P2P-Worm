@@ -420,10 +420,10 @@ Get-Content final_shellcode.bin -AsByteStream | .\injector.exe notepad.exe
 
 ### Packaging and AutoStart
 
-packer.ps1 assembles a self-contained start.ps1. It takes loader.exe and hvnc.bin as input paths, and outputs a single script that contains both binaries as Base64 arrays.
+packer.ps1 assembles a selfcontained start.ps1. It takes loader.exe and hvnc.bin as input paths, and outputs a single script that contains both binaries as Base64 arrays.
 
-* Parameters. -LoaderPath, -ShellcodePath, -OutPs1 — strictly checked for existence. Files are read into memory and encoded in Base64.
-* To-Chunks. Long Base64 strings are split into blocks of 1000 characters for convenient embedding in the template.
+* Parameters. LoaderPath, ShellcodePath, OutPs1 strictly checked for existence. Files are read into memory and encoded in Base64.
+* Chunks. Long Base64 strings are split into blocks of 1000 characters for convenient embedding in the template.
 * The start.ps1 template.
 
   1. Embeds the $loaderChunks/$shellChunks arrays.
@@ -431,7 +431,7 @@ packer.ps1 assembles a self-contained start.ps1. It takes loader.exe and hvnc.bi
   3. Persistence: copies the script itself to %LOCALAPPDATA%\Microsoft\Win32Components\sync.ps1 and registers a OneDrive Update task on logon.
   4. Restores ldr.exe from Base64 if it is missing.
   5. Restores shellcode and sends it through stdin to ldr.exe.
-  6. Completion — the main code now runs inside the target process.
+  6. Completion the main code now runs inside the target process.
 
 Generation and result:
 
@@ -439,7 +439,7 @@ Generation and result:
 .\packer.ps1 -LoaderPath .\loader.exe -ShellcodePath .\hvnc.bin -OutPs1 .\start.ps1
 ```
 
-The output is start.ps1, which sets up auto-start, restores loader.exe and the shellcode, passes the shellcode into loader.exe, and then exits.
+The output is start.ps1, which sets up autostart, restores loader.exe and the shellcode, passes the shellcode into loader.exe, and then exits.
 
 ### Short
 * Read shellcode from stdin fully.
@@ -455,9 +455,10 @@ The output is start.ps1, which sets up auto-start, restores loader.exe and the s
 
 ### Quick Start
 A short summary if you are already familiar with the tools:
-1. Donut → raw_shellcode.bin for the required architecture.
+1. Donut raw_shellcode.bin for the required architecture.
 2. Optionally add a SCOD header and use injector.exe, or directly feed shellcode to loader.exe via stdin.
-3. To automate deployment and autostart — run packer.ps1 and get start.ps1, which does the rest automatically.
+3. To automate deployment and autostart run packer.ps1 and get start.ps1, which does the rest automatically.
+
 
 
 
