@@ -375,7 +375,6 @@ The ptt_export interface then allows the worm to retrieve and forward tickets ov
 
 ---
 
-
 # Injector
 
 This tool solves a pragmatic task: how to turn a DLL into executable shellcode, conveniently deliver it into a target process, and run it through a single script with minimal manual actions. At its core is the native loader.exe, which takes shellcode from standard input and then carefully and correctly injects it into the selected process. Additionally, there is the packaging script packer.ps1, which generates a selfcontained start.ps1 capable of restoring the required binaries, performing the injection, and configuring autostart.
@@ -394,19 +393,19 @@ This data flow eliminates the need to store shellcode explicitly on disk it only
 
 The work of loader.exe is clear and transparent, and this predictability makes debugging easier:
 
-1. Initialization and preparation. Reads the entire stdin to EOF into a buffer. If needed, attempts to elevate privileges to `SeDebugPrivilege`. Performs light validation of the input blob by size/architecture.
-2. **Searching and choosing the target process.** Enumerates processes (`CreateToolhelp32Snapshot/Process32First/Process32Next` or `NtQuerySystemInformation`), filters by name and availability, carefully opens the process with the minimally required rights. If it fails, moves to the next candidate.
-3. **Delivering the shellcode.** The sequence “allocate memory → write → switch protection to RX” is implemented via `VirtualAllocEx`/`WriteProcessMemory`/`VirtualProtectEx` (or Nt-analogs). This order minimizes the RWX window.
-4. **Execution.** Creates a remote thread via `NtCreateThreadEx` (or `CreateRemoteThread` as a fallback). Alternatives like APC/hijack are possible, but the base scenario is a separate clean thread.
-5. **Completion and cleanup.** Optionally waits for the remote thread to finish, closes handles, wipes temporary buffers, logs telemetry (PID, status) if needed.
+1. Initialization and preparation. Reads the entire stdin to EOF into a buffer. If needed, attempts to elevate privileges. Performs light validation of the input blob by size/architecture.
+2. Searching and choosing the target process. Enumerates processes, filters by name and availability, carefully opens the process with the minimally required rights. If it fails, moves to the next candidate.
+3. Delivering the shellcode. The sequence allocate memory → write → switch protection to RX is implemented. This order minimizes the RWX window.
+4. Execution. Creates a remote thread. Alternatives like APC/hijack are possible, but the base scenario is a separate clean thread.
+5. Completion and cleanup. Optionally waits for the remote thread to finish, closes handles, wipes temporary buffers, logs telemetry PID, status if needed.
 
 ### Preparing Shellcode from EXE/DLL
 
 The basic path is through Donut.
 
-1. Install/build Donut and convert EXE/DLL into raw shellcode (`raw_shellcode.bin`) — with the correct architecture (`-a 2` for x64, `-a 1` for x86).
-2. Add a SCOD header to the raw shellcode using `add_header.py`, so that `injector.exe` accepts the input correctly.
-3. Pass the resulting file into the injector — through the standard input pipeline.
+1. Install/build Donut and convert EXE/DLL into raw shellcode with the correct architecture -a 2 for x64, -a 1 for x86.
+2. Add a SCOD header to the raw shellcode using add_header.py, so that injector.exe accepts the input correctly.
+3. Pass the resulting file into the injector through the standard input pipeline.
 
 Donut commands and injector usage:
 
@@ -431,7 +430,7 @@ packer.ps1 assembles a self-contained start.ps1. It takes loader.exe and hvnc.bi
   2. The Reassemble function joins arrays and decodes them into bytes.
   3. Persistence: copies the script itself to %LOCALAPPDATA%\Microsoft\Win32Components\sync.ps1 and registers a OneDrive Update task on logon.
   4. Restores ldr.exe from Base64 if it is missing.
-  5. Restores shellcode and sends it through `stdin` to ldr.exe.
+  5. Restores shellcode and sends it through stdin to ldr.exe.
   6. Completion — the main code now runs inside the target process.
 
 Generation and result:
@@ -459,6 +458,7 @@ A short summary if you are already familiar with the tools:
 1. Donut → raw_shellcode.bin for the required architecture.
 2. Optionally add a SCOD header and use injector.exe, or directly feed shellcode to loader.exe via stdin.
 3. To automate deployment and autostart — run packer.ps1 and get start.ps1, which does the rest automatically.
+
 
 
 
