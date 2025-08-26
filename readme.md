@@ -385,7 +385,7 @@ The chain looks like this:
 
 1. hvnc.bin — shellcode obtained from a DLL, which internally unpacks the DLL and calls the exported Run/StartAgent.
 2. loader.exe — a compact native loader in C. It reads shellcode from stdin, selects the target process according to a defined strategy, and performs delivery/execution inside it.
-3. start.ps1 — a script that unpacks loader.exe and hvnc.bin from embedded Base64 blocks, starts `loader.exe`, and passes shellcode to it via standard input.
+3. start.ps1 — a script that unpacks loader.exe and hvnc.bin from embedded Base64 blocks, starts loader.exe, and passes shellcode to it via standard input.
 
 This data flow eliminates the need to store shellcode explicitly on disk it only exists there at the moment of restoration within start.ps1 and simplifies routing the payload into the desired process. The entire cycle restore → inject → execute is closed within a single script.
 
@@ -458,6 +458,7 @@ A short summary if you are already familiar with the tools:
 1. Donut → raw_shellcode.bin for the required architecture.
 2. Optionally add a SCOD header and use injector.exe, or directly feed shellcode to loader.exe via stdin.
 3. To automate deployment and autostart — run packer.ps1 and get start.ps1, which does the rest automatically.
+
 
 
 
