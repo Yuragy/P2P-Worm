@@ -453,33 +453,34 @@ packer.ps1 assembles a self-contained start.ps1. It takes loader.exe and hvnc.bi
 
 Generation and result:
 
-```powershell
+```
 .\packer.ps1 -LoaderPath .\loader.exe -ShellcodePath .\hvnc.bin -OutPs1 .\start.ps1
 ```
 
-The output is `start.ps1`, which sets up auto-start, restores `loader.exe` and the shellcode, passes the shellcode into `loader.exe`, and then exits.
+The output is start.ps1, which sets up auto-start, restores loader.exe and the shellcode, passes the shellcode into loader.exe, and then exits.
 
 ---
 
 ## Checklist
 
-* Read shellcode from `stdin` fully.
-* Elevate privileges if necessary (`SeDebugPrivilege`).
+* Read shellcode from stdin fully.
+* Elevate privileges if necessary.
 * Correct enumeration/filtering of processes.
 * Open the process with minimally required rights.
 * Allocate memory in the target process and write shellcode.
 * Switch the page to RX before execution.
-* Execute via `NtCreateThreadEx` or fallback `CreateRemoteThread`.
+* Execute via NtCreateThreadEx or fallback CreateRemoteThread.
 * Wait/check execution status if needed.
 * Close handles, cleanup, handle failures, and move to the next candidate.
-* Optional — masking and artifact cleanup.
+* Optional masking and artifact cleanup.
 
 ## Quick Start
 
 A short summary if you are already familiar with the tools:
 
-1. Donut → `raw_shellcode.bin` for the required architecture.
-2. Optionally add a SCOD header and use `injector.exe`, **or** directly feed shellcode to `loader.exe` via `stdin`.
-3. To automate deployment and auto-start — run `packer.ps1` and get `start.ps1`, which does the rest automatically.
+1. Donut → raw_shellcode.bin for the required architecture.
+2. Optionally add a SCOD header and use injector.exe, or directly feed shellcode to loader.exe via stdin.
+3. To automate deployment and autostart — run packer.ps1 and get start.ps1, which does the rest automatically.
+
 
 
